@@ -4,6 +4,7 @@ const port = 5000 //port 번호
 // const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const config = require("./config/key");
+const { auth } = require("./middleware/auth");
 
 const { User } = require("./models/User");
 
@@ -62,6 +63,23 @@ app.post('/api/users/login', (req, res) => {
       })
     })
   })
+})
+
+//role === 0 , 일반유저 / role === 1, 관리자
+app.get('/api/users/auth', auth, (req, res) => { //auth = 미들웨어
+
+  //여기까지 미들웨어를 통과해 왔다는 얘기는 authentication이 true라는 말.
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image
+  })
+
 })
 
 // localhost:5000에서 호출될 수 있게 해줌
